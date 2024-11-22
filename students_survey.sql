@@ -1,0 +1,168 @@
+-- Data set:London Public Transport; 
+-- Source:sample data source from DataLab; 
+-- Queried using PostgreSQL, 
+
+CREATE TABLE dataset (
+    inter_dom VARCHAR,
+    region VARCHAR,
+    gender VARCHAR,
+    academic VARCHAR,
+    age FLOAT,
+    age_cate FLOAT,
+    stay FLOAT,
+    stay_cate VARCHAR,
+    japanese FLOAT,
+    japanese_cate VARCHAR,
+    english FLOAT,
+    english_cate VARCHAR,
+    intimate VARCHAR,
+    religion VARCHAR,
+    suicide VARCHAR,
+    dep VARCHAR,
+    deptype VARCHAR,
+    todep FLOAT,
+    depsev VARCHAR,
+    tosc FLOAT,
+    apd FLOAT,
+    ahome FLOAT,
+    aph FLOAT,
+    afear FLOAT,
+    acs FLOAT,
+    aguilt FLOAT,
+    amiscell FLOAT,
+    toas FLOAT,
+    partner FLOAT,
+    friends FLOAT,
+    parents FLOAT,
+    relative FLOAT,
+    profess FLOAT,
+    phone FLOAT,
+    doctor FLOAT,
+    reli FLOAT,
+    alone FLOAT,
+    others FLOAT,
+    internet FLOAT,
+    partner_bi VARCHAR,
+    friends_bi VARCHAR,
+    parents_bi VARCHAR,
+    relative_bi VARCHAR,
+    professional_bi VARCHAR,
+    phone_bi VARCHAR,
+    doctor_bi VARCHAR,
+    religion_bi VARCHAR,
+    alone_bi VARCHAR,
+    others_bi VARCHAR,
+    internet_bi VARCHAR
+);
+
+
+SELECT * 
+FROM students
+LIMIT 10;
+
+SELECT DISTINCT inter_dom
+FROM students;
+
+/*How the length of stay (stay) impacts the average mental health diagnostic 
+scores of the international students?*/
+SELECT 
+    stay,
+    COUNT(stay) AS count_int,
+    AVG(todep) AS average_phq, --depression
+    AVG(tosc) AS average_scs, --social connectedness
+    AVG(toas) AS average_as --acculturative stress
+FROM students
+WHERE inter_dom = 'Inter'
+GROUP BY stay
+ORDER BY stay DESC;
+
+--How the gender, age, level of japanease and english language affectcs on length of stay?
+SELECT stay_cate,gender, AVG(age) AS avg_age, AVG(japanese) AS avg_japanese, AVG(english) AS avg_english
+FROM students
+GROUP BY stay_cate, gender  
+ORDER BY stay_cate, avg_age DESC;
+
+--How does the level of Japanese language proficiency (japanese_cate) affect the length of stay?
+SELECT stay_cate, japanese_cate, COUNT(*) AS count
+FROM students
+GROUP BY stay_cate, japanese_cate
+ORDER BY stay_cate;
+
+--Are there differences in levels of depression (depsev) by region or gender?
+SELECT region, gender, depsev, COUNT(*) AS count
+FROM students
+WHERE depsev IS NOT NULL
+GROUP BY region, gender, depsev
+ORDER BY region, gender, count DESC;
+
+--Which age groups are most likely to use the Internet as a means of support?
+SELECT age, COUNT(*) AS internet_users
+FROM students
+WHERE internet_bi = 'Yes'
+GROUP BY age
+ORDER BY internet_users DESC;
+
+/*People from different regions differ and their attitudes toward using professional help 
+(professional_bi)?*/
+SELECT 
+    region,
+    professional_bi,
+    COUNT(*) AS count,
+    ROUND(100 * COUNT(*) / SUM(COUNT(*)) OVER (PARTITION BY region), 2) AS percentage
+FROM students
+GROUP BY region, professional_bi
+ORDER BY region, percentage DESC;
+
+--Are older students more likely to seek professional help than younger people?
+SELECT 	professional_bi,
+		ROUND(AVG(age),2) AS avg_age,
+		COUNT(*) AS count
+FROM students
+GROUP BY professional_bi
+ORDER BY avg_age DESC;
+
+--Does language proficiency affect attitudes toward professional help (professional_bi)?
+SELECT 	professional_bi,
+		ROUND(AVG(japanese),2) AS avg_japanese, 
+		ROUND(AVG(english), 2) AS avg_english,
+		COUNT(*) AS count
+FROM students
+GROUP BY professional_bi;
+
+-- Which region has the highest percentage of people receiving professional help?
+WITH counts_per_region AS (
+	SELECT 	region,
+		SUM(CASE WHEN professional_bi='Yes' THEN 1 ELSE 0 END) AS prof_help_count,
+		COUNT(*) AS total_count
+FROM students
+GROUP BY region
+)
+SELECT 	region,
+		prof_help_count,
+		total_count,
+		ROUND((100.0 * prof_help_count / total_count),2) AS percentage_prof_help
+FROM counts_per_region
+ORDER BY percentage_prof_help;
+
+--Let's explore differences in language skills between regions.
+SELECT
+	region,
+	ROUND(AVG(japanese), 2) AS avg_japanese,
+    ROUND(AVG(english), 2) AS avg_english,
+    COUNT(*) AS count
+FROM students
+--WHERE inter_dom = 'Inter'
+GROUP BY region
+ORDER BY avg_japanese DESC, avg_english DESC;
+
+--What is the correlation between the level of Japanese and English?
+SELECT CORR(japanese, english) AS correlation
+FROM students;
+
+--Does the level of Japanese language proficiency vary by gender?
+SELECT 	gender,
+		 ROUND(AVG(japanese), 2) AS avg_japanese,
+		 COUNT(*) AS count
+FROM students
+GROUP BY gender
+ORDER BY avg_japanese DESC;
