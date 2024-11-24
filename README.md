@@ -1,4 +1,4 @@
-# Sql Portfolio
+# SQL Portfolio
 
 Hello, and welcome to my SQL portfolio! This repository showcases examples of SQL scripts and queries I've created while working on solo projects and completing data analytics courses. These projects demonstrate my skills in data analysis, data cleaning, and generating insights from diverse datasets.  
 
