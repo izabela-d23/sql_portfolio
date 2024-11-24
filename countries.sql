@@ -1,3 +1,6 @@
+--Queried using postgresql
+--Working on multiple tables
+
 -- Which languages are official languages, and which ones are unofficial in Canada?
 SELECT c.country_name AS country, l.name AS language, official
 FROM countries AS c
@@ -77,7 +80,7 @@ ORDER BY code DESC;
 /*Let's see all countries in the cities table, whether or not they have a match 
 in the countries table (Left Join).*/
 SELECT 
-	c1.name AS city, 
+    c1.name AS city, 
     code, 
     c2.country_name AS country,
     region, 
