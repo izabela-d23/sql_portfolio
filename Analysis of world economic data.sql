@@ -127,10 +127,10 @@ FROM countries;
 
 -- Information about languages and currencies in Europe
 SELECT 
-	c1.country_name AS country, 
+    c1.country_name AS country, 
     region,
     l.name AS language,
-	basic_unit, 
+    basic_unit, 
     frac_unit
 FROM countries as c1 
 FULL JOIN languages AS l 
@@ -157,7 +157,7 @@ WHERE c.code in ('BGD','PAK','IND')
 
 /*five countries and their respective regions with the highest/lowest life expectancy for the year 2010*/
 SELECT 
-	c.country_name AS country,
+    c.country_name AS country,
     region,
     life_expectancy AS life_exp
 FROM countries AS c
@@ -170,7 +170,7 @@ LIMIT 5;
 
 --How much the populations for each country changed from 2010 to 2015?
 SELECT 
-	p1.country_code, 
+    p1.country_code, 
     p1.size AS size2010, 
     p2.size AS size2015
 FROM populations AS p1
