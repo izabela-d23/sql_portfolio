@@ -1,29 +1,10 @@
 --Queried using_ postgresql
 --data source: DataCamp
 
-CREATE TABLE product_emissions (
-    index SERIAL PRIMARY KEY,
-    id VARCHAR(50),
-    year INT,
-    product_name TEXT,
-    company TEXT,
-    country TEXT,
-    industry_group TEXT,
-    weight_kg FLOAT,
-    carbon_footprint_pcf FLOAT,
-    upstream_percent_total_pcf FLOAT,
-    operations_percent_total_pcf FLOAT,
-    downstream_percent_total_pcf FLOAT
-);
-
-SELECT *
-FROM product_emissions
-LIMIT 10;
-
 --What is total the carbon footprint of each industry in lastest year?
 SELECT industry_group,
-		COUNT(DISTINCT company) AS num_companies,
-		ROUND(CAST(SUM(carbon_footprint_pcf) AS NUMERIC), 1) AS total_industry_footprint
+	COUNT(DISTINCT company) AS num_companies,
+	ROUND(CAST(SUM(carbon_footprint_pcf) AS NUMERIC), 1) AS total_industry_footprint
 FROM product_emissions
 WHERE year = '2017'
 GROUP BY industry_group
@@ -36,7 +17,9 @@ GROUP BY country, company
 ORDER BY total_footprint DESC;
 
 --Which product in a particular industry had the highest carbon footprint in the selected year?
-SELECT industry_group, product_name, MAX(carbon_footprint_pcf) AS max_footprint
+SELECT industry_group, 
+	product_name, 
+	MAX(carbon_footprint_pcf) AS max_footprint
 FROM product_emissions
 WHERE year = '2015'
 GROUP BY industry_group, product_name
@@ -51,14 +34,17 @@ GROUP BY year
 ORDER BY year ASC;
 
 --Which products have the lowest carbon footprint in each industry in 2017?
-SELECT industry_group, product_name, MIN(carbon_footprint_pcf) AS min_footprint
+SELECT industry_group, 
+	product_name, 
+	MIN(carbon_footprint_pcf) AS min_footprint
 FROM product_emissions
 WHERE year = '2017'
 GROUP BY industry_group, product_name
 ORDER BY min_footprint ASC;
 
 --How does the average carbon footprint differ between countries?
-SELECT country, AVG(carbon_footprint_pcf) AS avg_footprint
+SELECT country, 
+	AVG(carbon_footprint_pcf) AS avg_footprint
 FROM product_emissions
 GROUP BY country
 ORDER BY avg_footprint DESC;
@@ -79,14 +65,17 @@ GROUP BY industry_group
 ORDER BY avg_operations_percentage DESC;
 
 --How has the global carbon footprint changed year-over-year?
-SELECT year, ROUND(SUM(carbon_footprint_pcf)) AS total_footprint
+SELECT year, 
+	ROUND(SUM(carbon_footprint_pcf)) AS total_footprint
 FROM product_emissions
 GROUP BY year
 ORDER BY year;
 
 --Which industries have reduced their carbon footprint the most over time?
 WITH YearlyFootprint AS(
-	SELECT year, industry_group, SUM(carbon_footprint_pcf) AS total_footprint
+	SELECT year, 
+	industry_group, 
+	SUM(carbon_footprint_pcf) AS total_footprint
 	FROM product_emissions
 	GROUP BY year, industry_group
 )
